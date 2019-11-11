@@ -13,9 +13,6 @@ function random(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-// export const random = (min, max) => {
-//   return Math.floor(Math.random() * (max - min + 1) + min);
-// }
 class Point {
   constructor(x, y) {
     this.x = x;
@@ -23,59 +20,42 @@ class Point {
   }
 }
 
-
 class Tree {
   constructor(leaf) {
     this.leaf = leaf;
     this.leftChild = undefined;
     this.rightChild = undefined;
   }
-  print() {
-    if (this.leftChild !== undefined)
-      this.leftChild.print();
-    if (this.rightChild !== undefined)
-      this.rightChild.print();
-  }
+
   getLeafs() {
     if (this.leftChild === undefined && this.rightChild === undefined)
       return [this.leaf];
     else
       return [].concat(this.leftChild.getLeafs(), this.rightChild.getLeafs());
   }
-  getLevel(level, queue) {
-    if (queue === undefined)
-      queue = [];
-    if (level === 1) {
-      queue.push(this);
-    }
-    else {
-      if (this.leftChild !== undefined)
-        this.leftChild.getLevel(level - 1, queue);
-      if (this.rightChild !== undefined)
-        this.rightChild.getLevel(level - 1, queue);
-    }
-    return queue;
-  }
+
   paint(context) {
-    // var context = context;
     this.leaf.paint(context);
-    if (this.leftChild !== undefined)
-      this.leftChild.paint(context);
-    if (this.rightChild !== undefined)
-      this.rightChild.paint(context);
+    if (this.leftChild !== undefined) this.leftChild.paint(context);
+    if (this.rightChild !== undefined) this.rightChild.paint(context);
   }
 }
 class Room {
-  constructor(x, y, w, h) {
+  constructor(x, y, width, height) {
     this.x = x;
     this.y = y;
-    this.w = w;
-    this.h = h;
-    this.center = new Point(this.x + this.w / 2, this.y + this.h / 2);
+    this.width = width;
+    this.height = height;
+    this.center = new Point(this.x + this.width / 2, this.y + this.height / 2);
   }
   paint(context) {
     context.fillStyle = "#b09fc2";
-    context.fillRect(this.x * SQUARE, this.y * SQUARE, this.w * SQUARE, this.h * SQUARE);
+    context.fillRect(
+      this.x * SQUARE,
+      this.y * SQUARE,
+      this.width * SQUARE,
+      this.height * SQUARE
+    );
   }
   drawPath(context, point) {
     context.beginPath();
@@ -87,36 +67,32 @@ class Room {
   }
 }
 
-
-
 class RoomContainer extends Room {
-  constructor(x, y, w, h) {
-    super(x, y, w, h)
- //   Room.call(this, x, y, w, h);
+  constructor(x, y, width, height) {
+    super(x, y, width, height);
     this.room = undefined;
   }
   paint(context) {
     context.strokeStyle = "#6a1a99";
     context.lineWidth = 2;
-    context.strokeRect(this.x * SQUARE, this.y * SQUARE, this.w * SQUARE, this.h * SQUARE);
+    context.strokeRect(
+      this.x * SQUARE,
+      this.y * SQUARE,
+      this.width * SQUARE,
+      this.height * SQUARE
+    );
   }
   growRoom() {
-    var x, y, w, h;
-    x = this.x + random(3, Math.floor(this.w / 3));
-    y = this.y + random(3, Math.floor(this.h / 3));
-    w = this.w - (x - this.x);
-    h = this.h - (y - this.y);
-    w -= random(3, w / 3);
-    h -= random(3, h / 3);
-    this.room = new Room(x, y, w, h);
+    var x, y, width, height;
+    x = this.x + random(3, Math.floor(this.width / 3));
+    y = this.y + random(3, Math.floor(this.height / 3));
+    width = this.width - (x - this.x);
+    height = this.height - (y - this.y);
+    width -= random(3, width / 3);
+    height -= random(3, height / 3);
+    this.room = new Room(x, y, width, height);
   }
 }
-
-//RoomContainer.prototype = Object.create(Room.prototype);
-
-//RoomContainer.prototype.constructor = RoomContainer;
-
-
 
 function random_split(room) {
   var r1, r2;
@@ -125,18 +101,18 @@ function random_split(room) {
     r1 = new RoomContainer(
       room.x,
       room.y, // r1.x, r1.y
-      random(1, room.w),
-      room.h // r1.w, r1.h
+      random(1, room.width),
+      room.height // r1.width, r1.height
     );
     r2 = new RoomContainer(
-      room.x + r1.w,
+      room.x + r1.width,
       room.y, // r2.x, r2.y
-      room.w - r1.w,
-      room.h // r2.w, r2.h
+      room.width - r1.width,
+      room.height // r2.width, r2.height
     );
     if (DISCARD_BY_RATIO) {
-      var r1_w_ratio = r1.w / r1.h;
-      var r2_w_ratio = r2.w / r2.h;
+      var r1_w_ratio = r1.width / r1.height;
+      var r2_w_ratio = r2.width / r2.height;
       if (r1_w_ratio < W_RATIO || r2_w_ratio < W_RATIO) {
         return random_split(room);
       }
@@ -146,18 +122,18 @@ function random_split(room) {
     r1 = new RoomContainer(
       room.x,
       room.y, // r1.x, r1.y
-      room.w,
-      random(1, room.h) // r1.w, r1.h
+      room.width,
+      random(1, room.height) // r1.width, r1.height
     );
     r2 = new RoomContainer(
       room.x,
-      room.y + r1.h, // r2.x, r2.y
-      room.w,
-      room.h - r1.h // r2.w, r2.h
+      room.y + r1.height, // r2.x, r2.y
+      room.width,
+      room.height - r1.height // r2.width, r2.height
     );
     if (DISCARD_BY_RATIO) {
-      var r1_h_ratio = r1.h / r1.w;
-      var r2_h_ratio = r2.h / r2.w;
+      var r1_h_ratio = r1.height / r1.width;
+      var r2_h_ratio = r2.height / r2.width;
       if (r1_h_ratio < H_RATIO || r2_h_ratio < H_RATIO) {
         return random_split(room);
       }
@@ -165,7 +141,7 @@ function random_split(room) {
   }
   return [r1, r2];
 }
- 
+
 function split_room(context, room, iter) {
   var root = new Tree(room);
   room.paint(context);
@@ -230,14 +206,10 @@ export default class Level {
   }
   paint() {
     this.clear();
-    if (D_BSP)
-      this.drawContainers();
-    if (D_ROOMS)
-      this.drawRooms();
-    if (D_PATHS)
-      this.drawPaths(this.room_tree);
-    if (D_GRID)
-      this.drawGrid();
+    if (D_BSP) this.drawContainers();
+    if (D_ROOMS) this.drawRooms();
+    if (D_PATHS) this.drawPaths(this.room_tree);
+    if (D_GRID) this.drawGrid();
   }
 }
 
