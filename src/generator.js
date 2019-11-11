@@ -40,6 +40,7 @@ class Tree {
     if (this.rightChild !== undefined) this.rightChild.paint(context);
   }
 }
+
 class Room {
   constructor(x, y, width, height) {
     this.x = x;
@@ -48,6 +49,7 @@ class Room {
     this.height = height;
     this.center = new Point(this.x + this.width / 2, this.y + this.height / 2);
   }
+
   paint(context) {
     context.fillStyle = "#b09fc2";
     context.fillRect(
@@ -57,6 +59,7 @@ class Room {
       this.height * SQUARE
     );
   }
+
   drawPath(context, point) {
     context.beginPath();
     context.lineWidth = SQUARE;
@@ -72,6 +75,7 @@ class RoomContainer extends Room {
     super(x, y, width, height);
     this.room = undefined;
   }
+
   paint(context) {
     context.strokeStyle = "#6a1a99";
     context.lineWidth = 2;
@@ -82,8 +86,9 @@ class RoomContainer extends Room {
       this.height * SQUARE
     );
   }
-  growRoom() {
-    var x, y, width, height;
+
+  createRoom() {
+    let x, y, width, height;
     x = this.x + random(3, Math.floor(this.width / 3));
     y = this.y + random(3, Math.floor(this.height / 3));
     width = this.width - (x - this.x);
@@ -94,8 +99,9 @@ class RoomContainer extends Room {
   }
 }
 
-function random_split(room) {
-  var r1, r2;
+function randomSplit(room) {
+  let r1, r2;
+
   if (random(0, 1) === 0) {
     // Vertical
     r1 = new RoomContainer(
@@ -111,10 +117,10 @@ function random_split(room) {
       room.height // r2.width, r2.height
     );
     if (DISCARD_BY_RATIO) {
-      var r1_w_ratio = r1.width / r1.height;
-      var r2_w_ratio = r2.width / r2.height;
+      let r1_w_ratio = r1.width / r1.height;
+      let r2_w_ratio = r2.width / r2.height;
       if (r1_w_ratio < W_RATIO || r2_w_ratio < W_RATIO) {
-        return random_split(room);
+        return randomSplit(room);
       }
     }
   } else {
@@ -132,23 +138,23 @@ function random_split(room) {
       room.height - r1.height // r2.width, r2.height
     );
     if (DISCARD_BY_RATIO) {
-      var r1_h_ratio = r1.height / r1.width;
-      var r2_h_ratio = r2.height / r2.width;
+      let r1_h_ratio = r1.height / r1.width;
+      let r2_h_ratio = r2.height / r2.width;
       if (r1_h_ratio < H_RATIO || r2_h_ratio < H_RATIO) {
-        return random_split(room);
+        return randomSplit(room);
       }
     }
   }
   return [r1, r2];
 }
 
-function split_room(context, room, iter) {
-  var root = new Tree(room);
+function splitRoom(context, room, iter) {
+  let root = new Tree(room);
   room.paint(context);
   if (iter !== 0) {
-    var sr = random_split(room);
-    root.leftChild = split_room(context, sr[0], iter - 1);
-    root.rightChild = split_room(context, sr[1], iter - 1);
+    let sr = randomSplit(room);
+    root.leftChild = splitRoom(context, sr[0], iter - 1);
+    root.rightChild = splitRoom(context, sr[1], iter - 1);
   }
   return root;
 }
@@ -160,22 +166,26 @@ export default class Level {
     this.context = canvas.getContext("2d");
     this.rooms = [];
   }
+
   init() {
-    var main_room = new RoomContainer(0, 0, MAP_SIZE, MAP_SIZE);
-    this.room_tree = split_room(this.context, main_room, N_ITERATIONS);
+    const main_room = new RoomContainer(0, 0, MAP_SIZE, MAP_SIZE);
+    this.room_tree = splitRoom(this.context, main_room, N_ITERATIONS);
     this.growRooms();
   }
+
   growRooms() {
-    var leafs = this.room_tree.getLeafs();
-    for (var i = 0; i < leafs.length; i++) {
-      leafs[i].growRoom();
+    let leafs = this.room_tree.getLeafs();
+    for (let i = 0; i < leafs.length; i++) {
+      leafs[i].createRoom();
       this.rooms.push(leafs[i].room);
     }
   }
+
   clear() {
     this.context.fillStyle = "#000";
     this.context.fillRect(0, 0, this.width, this.height);
   }
+
   drawPaths(tree) {
     if (tree.leftChild !== undefined && tree.rightChild !== undefined) {
       tree.leftChild.leaf.drawPath(this.context, tree.rightChild.leaf.center);
@@ -183,12 +193,13 @@ export default class Level {
       this.drawPaths(tree.rightChild);
     }
   }
+
   drawGrid() {
-    var context = this.context;
+    let context = this.context;
     context.beginPath();
     context.strokeStyle = "rgba(255,255,255,0.4)";
     context.lineWidth = 0.5;
-    for (var i = 0; i < MAP_SIZE; i++) {
+    for (let i = 0; i < MAP_SIZE; i++) {
       context.moveTo(i * SQUARE, 0);
       context.lineTo(i * SQUARE, MAP_SIZE * SQUARE);
       context.moveTo(0, i * SQUARE);
@@ -197,13 +208,16 @@ export default class Level {
     context.stroke();
     context.closePath();
   }
+
   drawContainers() {
     this.room_tree.paint(this.context);
   }
+
   drawRooms() {
-    for (var i = 0; i < this.rooms.length; i++)
+    for (let i = 0; i < this.rooms.length; i++)
       this.rooms[i].paint(this.context);
   }
+
   paint() {
     this.clear();
     if (D_BSP) this.drawContainers();
@@ -213,6 +227,3 @@ export default class Level {
   }
 }
 
-// const map = new Level(document.getElementById("genmap"));
-// map.init();
-// map.paint();

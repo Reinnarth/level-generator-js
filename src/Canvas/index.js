@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Level from "../demo";
+import Level from "../generator";
 
 class Canvas extends Component {
   state = {
