@@ -140,7 +140,7 @@ function randomSplit(room, widthRatio, heightRatio) {
 //     r1 = new RoomContainer(
 //       x,
 //       y, // r1.x, r1.y
-//       random(5, width),
+//       random(5, width-5),
 //       height // r1.width, r1.height
 //     );
 //     r2 = new RoomContainer(
@@ -154,7 +154,7 @@ function randomSplit(room, widthRatio, heightRatio) {
 //       x,
 //       y, // r1.x, r1.y
 //       width,
-//       random(5, height) // r1.width, r1.height
+//       random(5, height-5) // r1.width, r1.height
 //     );
 //     r2 = new RoomContainer(
 //       x,
@@ -168,7 +168,7 @@ function randomSplit(room, widthRatio, heightRatio) {
 //       r1 = new RoomContainer(
 //         room.x,
 //         room.y, // r1.x, r1.y
-//         random(5, room.width),
+//         random(5, room.width-5),
 //         room.height // r1.width, r1.height
 //       );
 //       r2 = new RoomContainer(
@@ -183,7 +183,7 @@ function randomSplit(room, widthRatio, heightRatio) {
 //         room.x,
 //         room.y, // r1.x, r1.y
 //         room.width,
-//         random(5, room.height) // r1.width, r1.height
+//         random(5, room.height-5) // r1.width, r1.height
 //       );
 //       r2 = new RoomContainer(
 //         room.x,
@@ -195,6 +195,7 @@ function randomSplit(room, widthRatio, heightRatio) {
 //   }
 //   return [r1, r2];
 // }
+
 function splitRoom(
   context,
   room,

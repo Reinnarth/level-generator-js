@@ -12,6 +12,8 @@ class Canvas extends Component {
     maxIterations: 10,
     widthRatio: 0.45,
     heightRatio: 0.45,
+    minRoomSize: 5,
+    maxRoomSize: 30,
     canvas: null
   };
 
